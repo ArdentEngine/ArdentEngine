@@ -14,6 +14,7 @@ public class GlfwWindow extends Window {
         if (this.window == MemoryUtil.NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
+        // TODO: Add input callbacks here
         // FIXME: This should not be called in Vulkan
         GLFW.glfwMakeContextCurrent(this.window);
     }

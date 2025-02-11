@@ -21,4 +21,6 @@ public abstract class DisplaySystem extends EngineSystem {
     }
 
     public abstract Window getMainWindow();
+
+    // TODO: Add a 'createWindow' method to add support for multiple windows
 }
