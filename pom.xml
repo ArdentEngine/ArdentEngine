@@ -9,6 +9,7 @@
 
     <modules>
         <module>ardent-core</module>
+        <module>ardent-demo</module>
         <module>ardent-glfw</module>
         <module>ardent-opengl</module>
     </modules>
