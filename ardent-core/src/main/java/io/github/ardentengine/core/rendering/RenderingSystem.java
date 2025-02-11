@@ -29,4 +29,6 @@ public abstract class RenderingSystem extends EngineSystem {
     public abstract VertexData createVertexData();
 
     public abstract ShaderProgram createShader();
+
+    public abstract TextureData createTexture();
 }

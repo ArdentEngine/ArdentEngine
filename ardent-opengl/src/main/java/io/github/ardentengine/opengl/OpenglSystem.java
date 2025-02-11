@@ -2,6 +2,7 @@ package io.github.ardentengine.opengl;
 
 import io.github.ardentengine.core.rendering.RenderingSystem;
 import io.github.ardentengine.core.rendering.ShaderProgram;
+import io.github.ardentengine.core.rendering.TextureData;
 import io.github.ardentengine.core.rendering.VertexData;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -42,6 +43,11 @@ public class OpenglSystem extends RenderingSystem {
     @Override
     public ShaderProgram createShader() {
         return new OpenglShader();
+    }
+
+    @Override
+    public TextureData createTexture() {
+        return new OpenglTexture();
     }
 
     @Override

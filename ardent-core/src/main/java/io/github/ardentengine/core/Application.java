@@ -1,5 +1,6 @@
 package io.github.ardentengine.core;
 
+import java.util.ArrayList;
 import java.util.ServiceLoader;
 
 public class Application implements Runnable {
@@ -12,18 +13,21 @@ public class Application implements Runnable {
 
     @Override
     public void run() {
-        var engineSystems = ServiceLoader.load(EngineSystem.class);
-        for (var engineSystem : engineSystems) {
+        var engineSystems = new ArrayList<EngineSystem>();
+        // Initialization of engine systems
+        for (var engineSystem : ServiceLoader.load(EngineSystem.class)) {
             engineSystem.initialize();
+            engineSystems.add(engineSystem);
         }
+        // Main loop
         while (running) {
             for (var engineSystem : engineSystems) {
                 engineSystem.process();
             }
         }
-        // TODO: Terminate should happen in reverse order
-        for (var engineSystem : engineSystems) {
-            engineSystem.terminate();
+        // Termination of engine systems in reverse order
+        for (var i = engineSystems.size() - 1; i >= 0; i--) {
+            engineSystems.get(i).terminate();
         }
     }
 

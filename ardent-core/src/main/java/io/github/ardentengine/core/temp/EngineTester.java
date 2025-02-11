@@ -3,6 +3,7 @@ package io.github.ardentengine.core.temp;
 import io.github.ardentengine.core.EngineSystem;
 import io.github.ardentengine.core.rendering.RenderingSystem;
 import io.github.ardentengine.core.rendering.ShaderProgram;
+import io.github.ardentengine.core.rendering.TextureData;
 import io.github.ardentengine.core.rendering.VertexData;
 
 import java.nio.ByteBuffer;
@@ -12,6 +13,7 @@ public class EngineTester extends EngineSystem {
 
     private final VertexData vertexData = RenderingSystem.getInstance().createVertexData();
     private final ShaderProgram shaderProgram = RenderingSystem.getInstance().createShader();
+    private final TextureData texture = RenderingSystem.getInstance().createTexture();
 
     @Override
     protected void initialize() {
@@ -34,9 +36,11 @@ public class EngineTester extends EngineSystem {
             layout(location = 0) in vec3 in_vertex;
 
             out vec3 vertex;
+            out vec2 uv;
 
             void main() {
                 vertex = in_vertex;
+                uv = vertex.xy + 0.5;
                 gl_Position = vec4(vertex, 1.0);
             }
             """
@@ -46,20 +50,27 @@ public class EngineTester extends EngineSystem {
             #version 450
 
             in vec3 vertex;
+            in vec2 uv;
 
             out vec4 frag_color;
 
+            layout(binding = 0) uniform sampler2D main_texture;
+
             void main() {
-                frag_color = vec4(vertex + 0.5, 1.0);
+                frag_color = texture(main_texture, uv);
             }
             """
         );
         this.shaderProgram.compile();
+        // TODO: Create texture resources and load textures
+        var pixels = ByteBuffer.allocateDirect(4).putInt(0x00ff00ff).flip();
+        this.texture.setTexture(pixels, 1, 1);
     }
 
     @Override
     protected void process() {
         this.shaderProgram.start();
+        this.texture.bind(0);
         this.vertexData.draw(6);
     }
 
