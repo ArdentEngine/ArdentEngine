@@ -52,17 +52,16 @@ public class RenderingSystem2D extends EngineSystem {
             out vec2 vertex;
             out vec2 uv;
 
-            //layout(std140, binding = 0) uniform Camera2D {
-            //    mat3 view_matrix;
-            //    mat4 projection_matrix;
-            //};
+            layout(std140, binding = 0) uniform Camera2D {
+                mat3 view_matrix;
+                mat4 projection_matrix;
+            };
 
             void main() {
                 vertex = in_vertex;
                 uv = in_uv;
-                gl_Position = vec4(vertex, 0.0, 1.0);
-            //    vec3 world_position = vec3(vertex, 0.0);
-            //    gl_Position = projection_matrix * vec4(view_matrix * world_position, 1.0);
+                vec3 world_position = vec3(vertex, 0.0);
+                gl_Position = projection_matrix * vec4(view_matrix * world_position, 1.0);
             }
             """
         );
@@ -84,6 +83,7 @@ public class RenderingSystem2D extends EngineSystem {
             }
             """
         );
+        // TODO: Discard fragments with a = 0.0 so that they are not written to the depth buffer
         this.defaultShader.compile();
     }
 
@@ -151,6 +151,7 @@ public class RenderingSystem2D extends EngineSystem {
     }
 
     public static void batchDraw(TextureData texture, Matrix2x3 transform, Rect2 region) {
+        // TODO: Separate opaque (alpha is either 1.0 or 0.0) from translucent (alpha is between 0.0 and 1.0)
         BATCH.add(renderingSystem -> renderingSystem.batch(texture, transform, region));
     }
 
