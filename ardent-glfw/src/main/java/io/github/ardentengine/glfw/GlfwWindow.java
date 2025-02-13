@@ -15,7 +15,9 @@ public class GlfwWindow extends Window {
             throw new RuntimeException("Failed to create the GLFW window");
         }
         // TODO: Add input callbacks here
-        // FIXME: This should not be called in Vulkan
+    }
+
+    public void makeContextCurrent() {
         GLFW.glfwMakeContextCurrent(this.window);
     }
 
@@ -29,9 +31,7 @@ public class GlfwWindow extends Window {
         return GLFW.glfwWindowShouldClose(this.window);
     }
 
-    @Override
-    public void update() {
-        // FIXME: This should not be called in Vulkan
+    public void swapBuffers() {
         GLFW.glfwSwapBuffers(this.window);
     }
 

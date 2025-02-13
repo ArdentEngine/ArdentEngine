@@ -10,9 +10,12 @@ public class OpenglTexture extends TextureData {
 
     private final int texture;
 
+    private int width = 0;
+    private int height = 0;
+
     public OpenglTexture() {
         var texture = GL11.glGenTextures();
-        ResourceCleaner.registerAction(this, () -> GL11.glDeleteTextures(texture));
+        CleaningSystem.registerAction(this, () -> GL11.glDeleteTextures(texture));
         this.texture = texture;
     }
 
@@ -26,6 +29,18 @@ public class OpenglTexture extends TextureData {
         // TODO: Add support for more image formats
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public int width() {
+        return this.width;
+    }
+
+    @Override
+    public int height() {
+        return this.height;
     }
 
     @Override

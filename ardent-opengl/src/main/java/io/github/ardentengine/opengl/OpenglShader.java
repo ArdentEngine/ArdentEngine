@@ -15,7 +15,7 @@ public class OpenglShader extends ShaderProgram {
     public OpenglShader() {
         var program = GL20.glCreateProgram();
         var shaders = new HashMap<Integer, Integer>();
-        ResourceCleaner.registerAction(this, () -> {
+        CleaningSystem.registerAction(this, () -> {
             for(var shader : shaders.values()) {
                 GL20.glDetachShader(program, shader);
                 GL20.glDeleteShader(shader);

@@ -8,7 +8,6 @@ public abstract class Window {
 
     public abstract boolean isCloseRequested();
 
-    public abstract void update();
-
+    // TODO: Should this class implement AutoCloseable?
     public abstract void destroy();
 }
