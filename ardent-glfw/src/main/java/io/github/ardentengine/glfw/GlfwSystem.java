@@ -22,7 +22,7 @@ public class GlfwSystem extends EngineSystem {
 
     @Override
     protected void initialize() {
-        MainWindow.getInstance().show();
+//        MainWindow.getInstance().show();
     }
 
     @Override

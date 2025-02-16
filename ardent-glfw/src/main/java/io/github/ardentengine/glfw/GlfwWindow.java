@@ -9,12 +9,16 @@ public class GlfwWindow extends Window {
 
     private final long window;
 
-    public GlfwWindow() {
-        this.window = GLFW.glfwCreateWindow(800, 450, "This is a hardcoded title", MemoryUtil.NULL, MemoryUtil.NULL);
+    public GlfwWindow(int width, int height, String title) {
+        this.window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (this.window == MemoryUtil.NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
         // TODO: Add input callbacks here
+    }
+
+    public GlfwWindow() {
+        this(800, 450, "untitled");
     }
 
     public void makeContextCurrent() {
