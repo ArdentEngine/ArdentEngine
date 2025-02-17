@@ -1,0 +1,7 @@
+vec2: !Vector2 {x: 1.0, y: 2.0}
+vec2i: !Vector2i {x: 1, y: 2}
+vec3: !Vector3 {x: 1.5, y: 2.5, z: -1.0}
+vec3i: !Vector3i {x: 1, y: 2, z: 3}
+vec4: !Vector4 {x: 1.1, y: 2.2, z: -4.2, w: 1.0}
+vec4i: !Vector4i {x: 1, y: 2, z: -3, w: 4}
+col: !Color {r: 1.0, g: 1.0, b: 0.0}

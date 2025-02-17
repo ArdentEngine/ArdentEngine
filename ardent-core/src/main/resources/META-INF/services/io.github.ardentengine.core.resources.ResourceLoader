@@ -1,1 +1,2 @@
 io.github.ardentengine.core.resources.TextureLoader
+io.github.ardentengine.core.resources.YamlLoader

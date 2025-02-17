@@ -10,4 +10,12 @@
 
     <artifactId>ardent-core</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.4</version>
+        </dependency>
+    </dependencies>
+
 </project>

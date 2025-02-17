@@ -13,7 +13,7 @@ import java.util.Properties;
  *     The values are loaded from the {@code application.properties files} and can be used as configuration options.
  * </p>
  */
-public class ApplicationProperties {
+public final class ApplicationProperties {
 
     // TODO: Handle default values and allow to add and remove properties
 

@@ -1,0 +1,12 @@
+mappingKey1:
+  list:
+    - value1
+    - value2
+    - value3
+  scalar: Scalar value
+mappingKey2:
+  subMap:
+    integer: 42
+    float: 1.0
+  anotherMap:
+    boolean: true
