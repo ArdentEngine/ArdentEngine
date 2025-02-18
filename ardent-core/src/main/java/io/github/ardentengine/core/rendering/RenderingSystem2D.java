@@ -60,7 +60,7 @@ public class RenderingSystem2D extends EngineSystem {
             void main() {
                 vertex = in_vertex;
                 uv = in_uv;
-                vec3 world_position = vec3(vertex, 0.0);
+                vec3 world_position = vec3(vertex, 1.0);
                 gl_Position = projection_matrix * vec4(view_matrix * world_position, 1.0);
             }
             """

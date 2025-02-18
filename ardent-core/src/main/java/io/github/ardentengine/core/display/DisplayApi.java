@@ -18,4 +18,10 @@ public abstract class DisplayApi {
     }
 
     public abstract Window getMainWindow();
+
+    // TODO: Add a way to get the position of the mouse (within a window or within the screen)
+
+    // TODO: Add a method to get key labels
+
+    // TODO: Add methods to set / get clipboard string
 }

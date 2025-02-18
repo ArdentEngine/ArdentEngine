@@ -2,6 +2,8 @@ package io.github.ardentengine.core.scene;
 
 import io.github.ardentengine.core.ApplicationProperties;
 import io.github.ardentengine.core.EngineSystem;
+import io.github.ardentengine.core.input.InputEvent;
+import io.github.ardentengine.core.input.InputSystem;
 import io.github.ardentengine.core.resources.ResourceManager;
 import io.github.ardentengine.core.resources.SceneData;
 
@@ -22,6 +24,7 @@ public class SceneTree extends EngineSystem {
             this.root = scene.instantiate();
             this.root.enterScene(this);
         }
+        InputSystem.setEventDispatchFunction(this::input);
     }
 
     public final Node root() {
@@ -35,6 +38,12 @@ public class SceneTree extends EngineSystem {
             this.root.update((time - this.previousTime) / 1_000_000_000.0f);
         }
         this.previousTime = time;
+    }
+
+    private void input(InputEvent event) {
+        if (this.root != null) {
+            this.root.input(event);
+        }
     }
 
     @Override

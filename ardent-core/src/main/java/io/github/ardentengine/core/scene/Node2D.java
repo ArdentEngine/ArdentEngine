@@ -56,6 +56,21 @@ public class Node2D extends Node {
         }
     }
 
+    public final void translate(Vector2 translation) {
+        Objects.requireNonNull(translation, "Translation cannot be null");
+        if (!translation.equals(0.0f, 0.0f)) {
+            this.position = this.position.plus(translation);
+            this.invalidateTransform();
+        }
+    }
+
+    public final void translate(float x, float y) {
+        if (x != 0.0f || y != 0.0f) {
+            this.position = this.position.plus(x, y);
+            this.invalidateTransform();
+        }
+    }
+
     public final double rotation() {
         return this.rotation;
     }

@@ -8,6 +8,6 @@ children:
     properties:
       texture: !resource textures/tile_0010.png
       position: !Vector2 {x: 5.0, y: 5.0}
-  - type: io.github.ardentengine.core.scene.Camera2D
+  - type: io.github.ardentengine.demo.CameraController2D
     properties:
       zoom: !Vector2 {x: 5.0, y: 5.0}

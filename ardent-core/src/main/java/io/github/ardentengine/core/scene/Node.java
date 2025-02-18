@@ -1,5 +1,7 @@
 package io.github.ardentengine.core.scene;
 
+import io.github.ardentengine.core.input.InputEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +34,17 @@ public class Node {
             child.update(deltaTime);
         }
         this.onUpdate(deltaTime);
+    }
+
+    protected void onInput(InputEvent event) {
+
+    }
+
+    void input(InputEvent event) {
+        for (var child : this.children) {
+            child.input(event);
+        }
+        this.onInput(event);
     }
 
     protected void onExit() {
