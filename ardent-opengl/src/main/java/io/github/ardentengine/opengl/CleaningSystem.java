@@ -13,14 +13,14 @@ public class CleaningSystem extends EngineSystem {
     private static final Queue<Runnable> CLEANING_ACTIONS = new LinkedList<>();
 
     public static void registerAction(Object object, Runnable action) {
-        // The actual cleaning action adds the given action to the set to ensure it is called on the main thread
+        // The actual cleaning action adds the given action to the queue to ensure it is called on the main thread
         CLEANER.register(object, () -> {
             // Queue the cleaning action so that it will be called by 'process'
             QUEUED_CLEANING_ACTIONS.add(action);
             // Remove the action so that it won't be called by 'terminate'
             CLEANING_ACTIONS.remove(action);
         });
-        // Add the action to the set so that it will be called by 'terminate'
+        // Add the action to the queue so that it will be called by 'terminate'
         CLEANING_ACTIONS.add(action);
     }
 

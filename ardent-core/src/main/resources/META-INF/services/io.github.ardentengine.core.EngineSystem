@@ -1,3 +1,4 @@
 io.github.ardentengine.core.scene.SceneTree
 io.github.ardentengine.core.input.InputSystem
+io.github.ardentengine.core.rendering.RenderingSystem3D
 io.github.ardentengine.core.rendering.RenderingSystem2D

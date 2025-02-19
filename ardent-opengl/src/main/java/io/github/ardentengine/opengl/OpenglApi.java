@@ -10,9 +10,13 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public class OpenglApi extends RenderingApi {
 
     private final UniformBuffer camera2D;
+    private final UniformBuffer camera3D;
 
     public OpenglApi() {
         // TODO: OpenGL needs different capabilities for different windows
@@ -20,6 +24,7 @@ public class OpenglApi extends RenderingApi {
         //  This however must be called AFTER glfwMakeContextCurrent
         GL.createCapabilities();
         this.camera2D = new UniformBuffer(0, 112);
+        this.camera3D = new UniformBuffer(1, 128);
     }
 
     @Override
@@ -33,6 +38,16 @@ public class OpenglApi extends RenderingApi {
     }
 
     @Override
+    public FloatBuffer createFloatBuffer(int capacity) {
+        return BufferUtils.createFloatBuffer(capacity);
+    }
+
+    @Override
+    public IntBuffer createIntBuffer(int capacity) {
+        return BufferUtils.createIntBuffer(capacity);
+    }
+
+    @Override
     public ShaderProgram createShader() {
         return new OpenglShader();
     }
@@ -40,6 +55,15 @@ public class OpenglApi extends RenderingApi {
     @Override
     public TextureData createTexture() {
         return new OpenglTexture();
+    }
+
+    @Override
+    public void setDepthTest(boolean depthTest) {
+        if (depthTest) {
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+        } else {
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+        }
     }
 
     @Override
@@ -54,5 +78,19 @@ public class OpenglApi extends RenderingApi {
         buffer.put(projection.m02()).put(projection.m12()).put(projection.m22()).put(projection.m32());
         buffer.put(projection.m03()).put(projection.m13()).put(projection.m23()).put(projection.m33());
         this.camera2D.put(buffer.flip());
+    }
+
+    @Override
+    public void setCamera3D(Matrix4 view, Matrix4 projection) {
+        var buffer = BufferUtils.createFloatBuffer(32);
+        buffer.put(view.m00()).put(view.m10()).put(view.m20()).put(view.m30());
+        buffer.put(view.m01()).put(view.m11()).put(view.m21()).put(view.m31());
+        buffer.put(view.m02()).put(view.m12()).put(view.m22()).put(view.m32());
+        buffer.put(view.m03()).put(view.m13()).put(view.m23()).put(view.m33());
+        buffer.put(projection.m00()).put(projection.m10()).put(projection.m20()).put(projection.m30());
+        buffer.put(projection.m01()).put(projection.m11()).put(projection.m21()).put(projection.m31());
+        buffer.put(projection.m02()).put(projection.m12()).put(projection.m22()).put(projection.m32());
+        buffer.put(projection.m03()).put(projection.m13()).put(projection.m23()).put(projection.m33());
+        this.camera3D.put(buffer.flip());
     }
 }

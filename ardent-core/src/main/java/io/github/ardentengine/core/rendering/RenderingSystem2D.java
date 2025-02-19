@@ -4,8 +4,6 @@ import io.github.ardentengine.core.EngineSystem;
 import io.github.ardentengine.core.math.Matrix2x3;
 import io.github.ardentengine.core.math.Rect2;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -19,9 +17,8 @@ public class RenderingSystem2D extends EngineSystem {
     private final VertexData vertexData = RenderingApi.getInstance().createVertexData();
     private final ShaderProgram defaultShader = RenderingApi.getInstance().createShader();
 
-    // TODO: Add a proper way to create buffers such as LWJGL's BufferUtils
-    private final FloatBuffer vertices = ByteBuffer.allocateDirect(MAX_BATCH_SIZE * 8 * Float.BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
-    private final FloatBuffer uvs = ByteBuffer.allocateDirect(MAX_BATCH_SIZE * 8 * Float.BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
+    private final FloatBuffer vertices = RenderingApi.getInstance().createFloatBuffer(MAX_BATCH_SIZE * 8);
+    private final FloatBuffer uvs = RenderingApi.getInstance().createFloatBuffer(MAX_BATCH_SIZE * 8);
     // TODO: Use a buffer for vertex colors
 
     // TODO: Use a default 1x1 white texture instead so that this is never null to allow to render just rectangles
@@ -31,16 +28,16 @@ public class RenderingSystem2D extends EngineSystem {
     @Override
     protected void initialize() {
         // Allocate spaces for vertices
-        this.vertexData.setAttribute(0, MAX_BATCH_SIZE * 8 * Float.BYTES, 2);
+        this.vertexData.allocateSpace(0, MAX_BATCH_SIZE * 4, 2);
         // Indices never need to be modified
-        var indices = ByteBuffer.allocateDirect(MAX_BATCH_SIZE * 6 * Integer.BYTES).order(ByteOrder.nativeOrder()).asIntBuffer();
+        var indices = RenderingApi.getInstance().createIntBuffer(MAX_BATCH_SIZE * 6);
         for (int i = 0; i < MAX_BATCH_SIZE * 4; i += 4) {
             indices.put(i).put(i + 1).put(i + 3);
             indices.put(i + 3).put(i + 1).put(i + 2);
         }
         this.vertexData.setIndices(indices.flip());
         // Allocate space for texture coordinates
-        this.vertexData.setAttribute(1, MAX_BATCH_SIZE * 8 * Float.BYTES, 2);
+        this.vertexData.allocateSpace(1, MAX_BATCH_SIZE * 4, 2);
         // TODO: Get the shader code from the ShaderLoader
         this.defaultShader.setVertexCode(
             """
@@ -146,8 +143,10 @@ public class RenderingSystem2D extends EngineSystem {
             iterator.next().accept(this);
             iterator.remove();
         }
-        // Flush the batch to draw the last elements
-        this.flush();
+        // Flush the batch to draw the last elements if there are any
+        if (this.current > 0) {
+            this.flush();
+        }
     }
 
     public static void batchDraw(TextureData texture, Matrix2x3 transform, Rect2 region) {

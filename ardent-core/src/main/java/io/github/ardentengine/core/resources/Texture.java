@@ -7,7 +7,7 @@ import io.github.ardentengine.core.rendering.RenderingApi;
 import io.github.ardentengine.core.rendering.RenderingSystem2D;
 import io.github.ardentengine.core.rendering.TextureData;
 
-public class Texture {
+public abstract class Texture {
 
     protected final TextureData textureData = RenderingApi.getInstance().createTexture();
 
