@@ -46,7 +46,7 @@ public record InputEventScroll(float horizontal, float vertical) implements Inpu
 
     @Override
     @SuppressWarnings("DeconstructionCanBeUsed")
-    public boolean matches(InputEvent event) {
+    public boolean matches(InputEvent event, boolean exact) {
         return event instanceof InputEventScroll eventScroll
             && MathUtils.equalsApprox(this.horizontal(), eventScroll.horizontal())
             && MathUtils.equalsApprox(this.vertical(), eventScroll.vertical());

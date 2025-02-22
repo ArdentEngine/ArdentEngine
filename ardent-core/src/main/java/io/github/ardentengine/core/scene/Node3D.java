@@ -175,4 +175,6 @@ public class Node3D extends Node {
     public final Vector3 globalPosition() {
         return this.globalTransform().column3();
     }
+
+    // TODO: Finish Node3D
 }

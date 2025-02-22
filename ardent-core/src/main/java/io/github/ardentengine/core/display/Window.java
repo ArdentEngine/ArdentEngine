@@ -6,6 +6,10 @@ public abstract class Window {
 
     public abstract void show();
 
+    public abstract void setCursorMode(CursorMode cursorMode);
+
+    public abstract CursorMode getCursorMode();
+
     public abstract boolean isCloseRequested();
 
     // TODO: Should this class implement AutoCloseable?

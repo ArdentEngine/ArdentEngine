@@ -164,9 +164,9 @@ public record InputEventKey(int key, int modifiers, boolean isPressed, boolean i
     }
 
     @Override
-    public boolean matches(InputEvent event) {
+    public boolean matches(InputEvent event, boolean exact) {
         return event instanceof InputEventKey eventKey
             && eventKey.key() == this.key()
-            && eventKey.modifiers() == this.modifiers();
+            && (!exact || eventKey.modifiers() == this.modifiers());
     }
 }

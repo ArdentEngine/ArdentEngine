@@ -5,7 +5,7 @@ package io.github.ardentengine.core.input;
  */
 public interface InputEvent {
 
-    // TODO: InputEventFromWindow, InputEventMouseMotion
+    // TODO: interface InputEventFromWindow
 
     /**
      * Checks if this input event is pressed.
@@ -46,6 +46,7 @@ public interface InputEvent {
      * @return True if this input event matches the given action, otherwise false.
      */
     default boolean isAction(String action) {
+        // TODO: This need to be changed to allow exact or non exact match
         return InputSystem.eventIsAction(this, action);
     }
 
@@ -90,10 +91,22 @@ public interface InputEvent {
 
     /**
      * Checks if this event matches the given one.
-     * Can be used to check if the given event corresponds to the same key or button.
+     * Can be used to check if the given event corresponds to the same key or button as this one.
+     *
+     * @param event The input event.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if this event matches the given one, otherwise false.
+     */
+    boolean matches(InputEvent event, boolean exact);
+
+    /**
+     * Checks if this event matches the given one.
+     * Can be used to check if the given event corresponds to the same key or button as this one.
      *
      * @param event The input event.
      * @return True if this event matches the given one, otherwise false.
      */
-    boolean matches(InputEvent event);
+    default boolean matches(InputEvent event) {
+        return this.matches(event, false);
+    }
 }

@@ -10,35 +10,32 @@ import java.util.function.Consumer;
 
 public class InputSystem extends EngineSystem {
 
-    /**
-     * The input map matches input events to an action.
-     */
+    /** The input map matches input events to an action. */
     private static final HashMap<String, Set<InputEvent>> INPUT_MAP = new HashMap<>();
 
     static {
         // TODO: Load this from file instead
         INPUT_MAP.computeIfAbsent("up", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_UP));
+        INPUT_MAP.computeIfAbsent("up", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_W));
         INPUT_MAP.computeIfAbsent("down", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_DOWN));
+        INPUT_MAP.computeIfAbsent("down", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_S));
         INPUT_MAP.computeIfAbsent("left", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT));
+        INPUT_MAP.computeIfAbsent("left", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_A));
         INPUT_MAP.computeIfAbsent("right", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT));
+        INPUT_MAP.computeIfAbsent("right", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_D));
+        INPUT_MAP.computeIfAbsent("space", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_SPACE));
+        INPUT_MAP.computeIfAbsent("shift", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT_SHIFT));
+        INPUT_MAP.computeIfAbsent("shift", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT_SHIFT));
     }
 
-    /**
-     * Keeps track of pressed actions.
-     */
+    /** Keeps track of pressed actions. */
     private static final Set<String> PRESSED_ACTIONS = new HashSet<>();
-    /**
-     * Keeps track of actions that were pressed this frame.
-     */
+    /** Keeps track of actions that were pressed this frame. */
     private static final Set<String> JUST_PRESSED_ACTIONS = new HashSet<>();
-    /**
-     * Keeps track of actions that were released this frame.
-     */
+    /** Keeps track of actions that were released this frame. */
     private static final Set<String> JUST_RELEASED_ACTIONS = new HashSet<>();
 
-    /**
-     * Keeps track of the strength of each action.
-     */
+    /** Keeps track of the strength of each action. */
     private static final HashMap<String, Float> ACTIONS_STRENGTH = new HashMap<>();
 
     private static Consumer<InputEvent> eventDispatchFunction;
@@ -48,18 +45,30 @@ public class InputSystem extends EngineSystem {
      *
      * @param event The input event.
      * @param action Name of the action.
+     * @param exact If false, additional modifiers will be ignored.
      * @return True if the given input event matches any of the events mapped to the given action, otherwise false.
      */
-    public static boolean eventIsAction(InputEvent event, String action) {
+    public static boolean eventIsAction(InputEvent event, String action, boolean exact) {
         var actionEvents = INPUT_MAP.get(action);
         if (actionEvents != null) {
             for (var actionEvent : actionEvents) {
-                if (actionEvent.matches(event)) {
+                if (actionEvent.matches(event, exact)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * Checks if the given event is associated with the given action in the input map.
+     *
+     * @param event The input event.
+     * @param action Name of the action.
+     * @return True if the given input event matches any of the events mapped to the given action, otherwise false.
+     */
+    public static boolean eventIsAction(InputEvent event, String action) {
+        return eventIsAction(event, action, false);
     }
 
     // TODO: Add methods to interact with the input map
@@ -104,6 +113,7 @@ public class InputSystem extends EngineSystem {
      * @return True if the action is being pressed, otherwise false.
      */
     public static boolean isActionPressed(String action) {
+        // TODO: This need to be changed to allow exact or non exact match
         return PRESSED_ACTIONS.contains(action);
     }
 

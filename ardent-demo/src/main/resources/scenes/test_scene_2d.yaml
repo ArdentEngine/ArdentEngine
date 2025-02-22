@@ -1,5 +1,7 @@
 !!io.github.ardentengine.core.resources.SceneData
 type: io.github.ardentengine.demo.TestScene
+properties:
+  nextScene: scenes/test_scene_3d.yaml
 children:
   - type: io.github.ardentengine.core.scene.Sprite2D
     properties:
