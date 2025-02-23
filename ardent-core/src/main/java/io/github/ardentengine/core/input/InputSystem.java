@@ -15,28 +15,25 @@ public class InputSystem extends EngineSystem {
 
     static {
         // TODO: Load this from file instead
-        INPUT_MAP.computeIfAbsent("up", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_UP));
-        INPUT_MAP.computeIfAbsent("up", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_W));
-        INPUT_MAP.computeIfAbsent("down", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_DOWN));
-        INPUT_MAP.computeIfAbsent("down", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_S));
-        INPUT_MAP.computeIfAbsent("left", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT));
-        INPUT_MAP.computeIfAbsent("left", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_A));
-        INPUT_MAP.computeIfAbsent("right", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT));
-        INPUT_MAP.computeIfAbsent("right", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_D));
-        INPUT_MAP.computeIfAbsent("space", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_SPACE));
-        INPUT_MAP.computeIfAbsent("shift", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT_SHIFT));
-        INPUT_MAP.computeIfAbsent("shift", key -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT_SHIFT));
+        INPUT_MAP.computeIfAbsent("up", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_UP));
+        INPUT_MAP.computeIfAbsent("up", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_W));
+        INPUT_MAP.computeIfAbsent("down", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_DOWN));
+        INPUT_MAP.computeIfAbsent("down", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_S));
+        INPUT_MAP.computeIfAbsent("left", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT));
+        INPUT_MAP.computeIfAbsent("left", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_A));
+        INPUT_MAP.computeIfAbsent("right", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT));
+        INPUT_MAP.computeIfAbsent("right", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_D));
+        INPUT_MAP.computeIfAbsent("space", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_SPACE));
+        INPUT_MAP.computeIfAbsent("shift", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_LEFT_SHIFT));
+        INPUT_MAP.computeIfAbsent("shift", action -> new HashSet<>()).add(new InputEventKey(InputEventKey.KEY_RIGHT_SHIFT));
     }
 
-    /** Keeps track of pressed actions. */
-    private static final Set<String> PRESSED_ACTIONS = new HashSet<>();
-    /** Keeps track of actions that were pressed this frame. */
-    private static final Set<String> JUST_PRESSED_ACTIONS = new HashSet<>();
-    /** Keeps track of actions that were released this frame. */
-    private static final Set<String> JUST_RELEASED_ACTIONS = new HashSet<>();
-
-    /** Keeps track of the strength of each action. */
-    private static final HashMap<String, Float> ACTIONS_STRENGTH = new HashMap<>();
+    /** Keeps track of pressed events. */
+    private static final Set<InputEvent> PRESSED_EVENTS = new HashSet<>();
+    /** Keeps track of events that were pressed this frame. */
+    private static final Set<InputEvent> JUST_PRESSED_EVENTS = new HashSet<>();
+    /** Keeps track of events that were released this frame. */
+    private static final Set<InputEvent> JUST_RELEASED_EVENTS = new HashSet<>();
 
     private static Consumer<InputEvent> eventDispatchFunction;
 
@@ -80,22 +77,16 @@ public class InputSystem extends EngineSystem {
      * @param event The event to parse.
      */
     public static void parseEvent(InputEvent event) {
-        for (var action : INPUT_MAP.keySet()) {
-            if (eventIsAction(event, action)) {
-                if (event.isPressed()) {
-                    if (!event.isEcho()) {
-                        JUST_PRESSED_ACTIONS.add(action);
-                    }
-                    PRESSED_ACTIONS.add(action);
-                    ACTIONS_STRENGTH.put(action, Math.max(ACTIONS_STRENGTH.getOrDefault(action, 0.0f), event.strength()));
-                } else if (event.isReleased()) {
-                    JUST_RELEASED_ACTIONS.remove(action);
-                    PRESSED_ACTIONS.remove(action);
-                    ACTIONS_STRENGTH.put(action, Math.min(ACTIONS_STRENGTH.getOrDefault(action, 0.0f), event.strength()));
-                }
-                // TODO: Handle events that are not pressed nor released such as joystick axes and mouse motion
+        if (event.isPressed()) {
+            if (!event.isEcho()) {
+                JUST_PRESSED_EVENTS.add(event);
+                PRESSED_EVENTS.add(event);
             }
+        } else if (event.isReleased()) {
+            PRESSED_EVENTS.removeIf(event::matches);
+            JUST_RELEASED_EVENTS.remove(event);
         }
+        // TODO: Handle events that are not pressed nor released such as joystick axes and mouse motion
         if (eventDispatchFunction != null) {
             eventDispatchFunction.accept(event);
         }
@@ -110,11 +101,43 @@ public class InputSystem extends EngineSystem {
      * Returns true if the given action is being pressed.
      *
      * @param action The action name.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if the action is being pressed, otherwise false.
+     */
+    public static boolean isActionPressed(String action, boolean exact) {
+        for (var event : PRESSED_EVENTS) {
+            if (event.isAction(action, exact)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the given action is being pressed.
+     *
+     * @param action The action name.
      * @return True if the action is being pressed, otherwise false.
      */
     public static boolean isActionPressed(String action) {
-        // TODO: This need to be changed to allow exact or non exact match
-        return PRESSED_ACTIONS.contains(action);
+        return isActionPressed(action, false);
+    }
+
+    /**
+     * Returns true if the given action has been pressed in the current frame.
+     * Used for code that needs to run only once when an action is pressed, instead of every frame while it is pressed.
+     *
+     * @param action The action name.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if the given action has been pressed in the current frame, otherwise false.
+     */
+    public static boolean isActionJustPressed(String action, boolean exact) {
+        for (var event : JUST_PRESSED_EVENTS) {
+            if (event.isAction(action, exact)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -125,7 +148,23 @@ public class InputSystem extends EngineSystem {
      * @return True if the given action has been pressed in the current frame, otherwise false.
      */
     public static boolean isActionJustPressed(String action) {
-        return JUST_PRESSED_ACTIONS.contains(action);
+        return isActionJustPressed(action, false);
+    }
+
+    /**
+     * Returns true if the given action has been released in the current frame.
+     *
+     * @param action The action name.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if the given action has been released in the current frame, otherwise false.
+     */
+    public static boolean isActionJustReleased(String action, boolean exact) {
+        for (var event : JUST_RELEASED_EVENTS) {
+            if (event.isAction(action, exact)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -135,7 +174,29 @@ public class InputSystem extends EngineSystem {
      * @return True if the given action has been released in the current frame, otherwise false.
      */
     public static boolean isActionJustReleased(String action) {
-        return JUST_RELEASED_ACTIONS.contains(action);
+        return isActionJustReleased(action, false);
+    }
+
+    /**
+     * Returns the strength of the given action as a number between 0 and 1.
+     * Can handle multiple buttons being held down simultaneously.
+     * <p>
+     *     For input events that correspond to a key or a button, returns 1 if the event is pressed, otherwise 0.
+     *     For input events that correspond to triggers or analog stick, the number indicates how far away the input is from the dead zone.
+     * </p>
+     *
+     * @param action The action name.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return The strength of the specified action.
+     */
+    public static float getActionStrength(String action, boolean exact) {
+        var strength = 0.0f;
+        for (var event : PRESSED_EVENTS) {
+            if (event.isAction(action, exact)) {
+                strength += event.strength();
+            }
+        }
+        return strength;
     }
 
     /**
@@ -150,7 +211,7 @@ public class InputSystem extends EngineSystem {
      * @return The strength of the specified action.
      */
     public static float getActionStrength(String action) {
-        return ACTIONS_STRENGTH.getOrDefault(action, 0.0f);
+        return getActionStrength(action, false);
     }
 
     /**
@@ -191,8 +252,8 @@ public class InputSystem extends EngineSystem {
 
     @Override
     protected void process() {
-        JUST_PRESSED_ACTIONS.clear();
-        JUST_RELEASED_ACTIONS.clear();
+        JUST_PRESSED_EVENTS.clear();
+        JUST_RELEASED_EVENTS.clear();
     }
 
     @Override

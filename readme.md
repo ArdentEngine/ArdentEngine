@@ -48,6 +48,7 @@ The engine will be responsible for loading the correct library for the current o
 | 2D rendering of textures           | In progress |
 | Resource manager                   | Done        |
 | Keyboard input system              | Done        |
+| Input map                          | In progress |
 | Basic 3D lighting                  | Missing     |
 | Basic materials and shaders system | Missing     |
 

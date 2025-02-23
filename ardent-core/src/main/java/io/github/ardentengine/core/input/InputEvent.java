@@ -43,11 +43,39 @@ public interface InputEvent {
      * The input map can be accessed through the {@link InputSystem} class.
      *
      * @param action Name of the action.
+     * @param exact If false, additional modifiers will be ignored.
      * @return True if this input event matches the given action, otherwise false.
+     *
+     * @see InputSystem#eventIsAction(InputEvent, String, boolean)
+     */
+    default boolean isAction(String action, boolean exact) {
+        return InputSystem.eventIsAction(this, action, exact);
+    }
+
+    /**
+     * Checks if this input event matches an action specified in the input map.
+     * The input map can be accessed through the {@link InputSystem} class.
+     *
+     * @param action Name of the action.
+     * @return True if this input event matches the given action, otherwise false.
+     *
+     * @see InputSystem#eventIsAction(InputEvent, String)
      */
     default boolean isAction(String action) {
-        // TODO: This need to be changed to allow exact or non exact match
-        return InputSystem.eventIsAction(this, action);
+        return this.isAction(action, false);
+    }
+
+    /**
+     * Checks if this input event is pressed, is not an echo event, and matches the given action.
+     *
+     * @param action Name of the action.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if this input event is pressed and matches the given action.
+     *
+     * @see InputEvent#isAction(String)
+     */
+    default boolean isActionPressed(String action, boolean exact) {
+        return this.isPressed() && !this.isEcho() && this.isAction(action, exact);
     }
 
     /**
@@ -59,7 +87,20 @@ public interface InputEvent {
      * @see InputEvent#isAction(String)
      */
     default boolean isActionPressed(String action) {
-        return this.isPressed() && !this.isEcho() && this.isAction(action);
+        return this.isActionPressed(action, false);
+    }
+
+    /**
+     * Checks if this input event is released and matches the given action.
+     *
+     * @param action Name of the action.
+     * @param exact If false, additional modifiers will be ignored.
+     * @return True if this input event is released and matches the given action.
+     *
+     * @see InputEvent#isAction(String)
+     */
+    default boolean isActionReleased(String action, boolean exact) {
+        return this.isReleased() && this.isAction(action, exact);
     }
 
     /**
@@ -71,7 +112,7 @@ public interface InputEvent {
      * @see InputEvent#isAction(String)
      */
     default boolean isActionReleased(String action) {
-        return this.isReleased() && this.isAction(action);
+        return this.isActionReleased(action, false);
     }
 
     /**
