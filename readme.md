@@ -8,6 +8,7 @@ Ardent Engine is a free and open source general purpose game engine written in J
 * Support for multiple platforms.
 * Efficient 2D and 3D rendering.
 * Efficient 2D and 3D physics.
+* Easy access to low level engine classes
 
 ## Core pillars
 
@@ -18,17 +19,19 @@ This will allow components to be added, removed, or replaced without altering th
 
 For example, it will be possible to change the rendering module from OpenGL to Vulkan and vice versa by changing a dependency.
 
+Different modules will also be used for different platform backends.
+
 ### Ease of use
 
 Ease of use is the primary focus of the engine's design.
-Some systems were made to be similar to other popular engines users may be more familiar with.
+The engine's systems are designed to be easy to use and easy to gain familiarity with.
 
 Some classes deliberately avoid the usage of complex design patterns or hide their implementation to allow users with basic programming knowledge to work with the engine.
 
 ### Portability
 
 The final goal will be to allow users to create the game once and build for several different platforms.
-The current target is Desktop (any OS), Android, and Web.
+The current target is Windows, Linux, macOS, and Android.
 
 ### Efficiency
 
@@ -68,6 +71,7 @@ The engine will be responsible for loading the correct library for the current o
 * Support for multiple windows
 * Gamepad input system
 * Physics system using JNI (either Jolt or Bullet)
+* Improve the design of the editor application
 
 ### Version 0.4
 
@@ -83,3 +87,9 @@ The engine will be responsible for loading the correct library for the current o
 * Intellij plugin to embed the editor in the IDE?
 * Web support?
 * Other?
+
+## About the project
+
+Ardent Engine was developed by a single person and was started as a simple rendering engine written for a bachelor thesis.
+
+Contributions are always welcome!
