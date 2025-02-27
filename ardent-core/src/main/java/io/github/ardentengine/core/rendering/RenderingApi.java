@@ -44,6 +44,10 @@ public abstract class RenderingApi {
 
     public abstract TextureData createTexture();
 
+    // TODO: Right now users have no way to know which one is the first unused binding
+
+    public abstract UniformBuffer createUniformBuffer(int binding, long size);
+
     public abstract void setDepthTest(boolean depthTest);
 
     // TODO: Cull face

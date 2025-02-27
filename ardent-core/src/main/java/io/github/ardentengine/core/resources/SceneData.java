@@ -48,10 +48,12 @@ public class SceneData {
                     field.set(node, booleanValue);
                 }
             }
+            // FIXME: When resources are loaded from scene files, modifying them will modify that resource in all next calls to 'instantiate' and that is not good
         } catch (NoSuchFieldException e) {
             // Look for a field with the same name in the superclass
             if (inClass.equals(Node.class)) {
-                throw new RuntimeException("Cannot find field with name " + name, e);
+                System.err.println("Cannot find field with name " + name);
+                e.printStackTrace();
             } else {
                 setField(node, inClass.getSuperclass(), name, value);
             }

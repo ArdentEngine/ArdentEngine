@@ -3,7 +3,9 @@ package io.github.ardentengine.core.rendering;
 import io.github.ardentengine.core.EngineSystem;
 import io.github.ardentengine.core.math.Matrix2x3;
 import io.github.ardentengine.core.math.Rect2;
+import io.github.ardentengine.core.resources.ShaderLoader;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -16,13 +18,14 @@ public class RenderingSystem2D extends EngineSystem {
 
     private final VertexData vertexData = RenderingApi.getInstance().createVertexData();
     private final ShaderProgram defaultShader = RenderingApi.getInstance().createShader();
+    private final TextureData defaultTexture = RenderingApi.getInstance().createTexture();
 
     private final FloatBuffer vertices = RenderingApi.getInstance().createFloatBuffer(MAX_BATCH_SIZE * 8);
     private final FloatBuffer uvs = RenderingApi.getInstance().createFloatBuffer(MAX_BATCH_SIZE * 8);
     // TODO: Use a buffer for vertex colors
 
-    // TODO: Use a default 1x1 white texture instead so that this is never null to allow to render just rectangles
-    private TextureData currentTexture = null;
+    private ShaderProgram currentShader = this.defaultShader;
+    private TextureData currentTexture = this.defaultTexture;
     private int current = 0;
 
     @Override
@@ -38,55 +41,17 @@ public class RenderingSystem2D extends EngineSystem {
         this.vertexData.setIndices(indices.flip());
         // Allocate space for texture coordinates
         this.vertexData.allocateSpace(1, MAX_BATCH_SIZE * 4, 2);
-        // TODO: Get the shader code from the ShaderLoader
-        this.defaultShader.setVertexCode(
-            """
-            #version 450
-
-            layout(location = 0) in vec2 in_vertex;
-            layout(location = 1) in vec2 in_uv;
-
-            out vec2 vertex;
-            out vec2 uv;
-
-            layout(std140, binding = 0) uniform Camera2D {
-                mat3 view_matrix;
-                mat4 projection_matrix;
-            };
-
-            void main() {
-                vertex = in_vertex;
-                uv = in_uv;
-                vec3 world_position = vec3(vertex, 1.0);
-                gl_Position = projection_matrix * vec4(view_matrix * world_position, 1.0);
-            }
-            """
-        );
-        this.defaultShader.setFragmentCode(
-            """
-            #version 450
-
-            in vec2 vertex;
-            in vec2 uv;
-
-            out vec4 frag_color;
-
-            //uniform ivec2 texture_size;
-            layout(binding = 0) uniform sampler2D main_texture;
-
-            void main() {
-            //    frag_color = vec4(uv, 0.0, 1.0);
-                frag_color = texture(main_texture, uv);
-            }
-            """
-        );
-        // TODO: Discard fragments with a = 0.0 so that they are not written to the depth buffer
+        // Create the default shader
+        this.defaultShader.setVertexCode(ShaderLoader.getBuiltinShaderCode("default_shader_2d.vert"));
+        this.defaultShader.setFragmentCode(ShaderLoader.getBuiltinShaderCode("default_shader_2d.frag"));
         this.defaultShader.compile();
+        // Create the default texture
+        this.defaultTexture.setTexture(ByteBuffer.allocateDirect(4).putInt(0xffffffff).flip(), 1, 1);
     }
 
     private void flush() {
         // Use the current shader and the current texture
-        this.defaultShader.start();
+        this.currentShader.start();
         this.currentTexture.bind(0);
         // Update the buffers
         this.vertexData.updateAttribute(0, 0, this.vertices.flip());
@@ -99,12 +64,14 @@ public class RenderingSystem2D extends EngineSystem {
         this.current = 0;
     }
 
-    private void batch(TextureData texture, Matrix2x3 transform, Rect2 region) {
+    private void batch(TextureData texture, Matrix2x3 transform, Rect2 region, ShaderProgram shader) {
         // Flush the batch if the texture has changed
-        if(this.current > 0 && this.currentTexture != texture) {
+        if(this.current > 0 && (this.currentTexture != texture || this.currentShader != shader)) {
+            // TODO: Multiple textures can be used in the same draw call
             this.flush();
         }
         // Update the batch to draw this texture
+        this.currentShader = shader;
         this.currentTexture = texture;
         var halfWidth = texture.width() * 0.5f;
         var halfHeight = texture.height() * 0.5f;
@@ -135,8 +102,13 @@ public class RenderingSystem2D extends EngineSystem {
         }
     }
 
+    private void batch(TextureData texture, Matrix2x3 transform, Rect2 region) {
+        this.batch(texture, transform, region, this.defaultShader);
+    }
+
     @Override
     protected void process() {
+        // TODO: Should depth test be enabled or disabled?
         // Run through the batch in order
         var iterator = BATCH.iterator();
         while (iterator.hasNext()) {
@@ -149,8 +121,14 @@ public class RenderingSystem2D extends EngineSystem {
         }
     }
 
+    // TODO: Separate opaque (alpha is either 1.0 or 0.0) from translucent (alpha is between 0.0 and 1.0)
+
+    public static void batchDraw(TextureData texture, Matrix2x3 transform, Rect2 region, ShaderProgram shader) {
+        // TODO: This also needs a material
+        BATCH.add(renderingSystem -> renderingSystem.batch(texture, transform, region, shader));
+    }
+
     public static void batchDraw(TextureData texture, Matrix2x3 transform, Rect2 region) {
-        // TODO: Separate opaque (alpha is either 1.0 or 0.0) from translucent (alpha is between 0.0 and 1.0)
         BATCH.add(renderingSystem -> renderingSystem.batch(texture, transform, region));
     }
 

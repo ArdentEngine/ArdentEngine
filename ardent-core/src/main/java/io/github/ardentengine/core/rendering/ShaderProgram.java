@@ -4,6 +4,8 @@ import io.github.ardentengine.core.math.Matrix3x4;
 
 public abstract class ShaderProgram {
 
+    // TODO: Shader files (.vert and .frag) can't stay in the core module because in OpenGL they are stored in the jar as text and in Vulkan the jar must contain the compiled SPIR-V bytecode
+
     public abstract void setVertexCode(CharSequence code);
 
     public abstract void setFragmentCode(CharSequence code);

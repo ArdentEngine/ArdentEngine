@@ -2,10 +2,7 @@ package io.github.ardentengine.opengl;
 
 import io.github.ardentengine.core.math.Matrix3;
 import io.github.ardentengine.core.math.Matrix4;
-import io.github.ardentengine.core.rendering.RenderingApi;
-import io.github.ardentengine.core.rendering.ShaderProgram;
-import io.github.ardentengine.core.rendering.TextureData;
-import io.github.ardentengine.core.rendering.VertexData;
+import io.github.ardentengine.core.rendering.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -15,16 +12,17 @@ import java.nio.IntBuffer;
 
 public class OpenglApi extends RenderingApi {
 
-    private final UniformBuffer camera2D;
-    private final UniformBuffer camera3D;
+    // TODO: If buffers are accessible in the core module then these two should be moved there
+    private final OpenglUniformBuffer camera2D;
+    private final OpenglUniformBuffer camera3D;
 
     public OpenglApi() {
         // TODO: OpenGL needs different capabilities for different windows
         //  Capabilities also need to have been created before any OpenGL function can be called
         //  This however must be called AFTER glfwMakeContextCurrent
         GL.createCapabilities();
-        this.camera2D = new UniformBuffer(0, 112);
-        this.camera3D = new UniformBuffer(1, 128);
+        this.camera2D = new OpenglUniformBuffer(0, 112);
+        this.camera3D = new OpenglUniformBuffer(1, 128);
     }
 
     @Override
@@ -55,6 +53,11 @@ public class OpenglApi extends RenderingApi {
     @Override
     public TextureData createTexture() {
         return new OpenglTexture();
+    }
+
+    @Override
+    public UniformBuffer createUniformBuffer(int binding, long size) {
+        return new OpenglUniformBuffer(binding, size);
     }
 
     @Override

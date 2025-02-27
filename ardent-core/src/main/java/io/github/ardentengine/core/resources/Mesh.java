@@ -50,11 +50,26 @@ public abstract class Mesh {
         this.onUpdateMesh();
     }
 
-    public final void draw(Matrix3x4 transform) {
+    public final void draw(Matrix3x4 transform, Material material) {
+        // Update the mesh before drawing it if an update was requested
         if (this.dirty) {
             this.updateMesh();
             this.dirty = false;
         }
-        RenderingSystem3D.batchDraw(this.vertexData, transform);
+        // Queue the drawing of the mesh
+        if (material instanceof ShaderMaterial shaderMaterial && shaderMaterial.shader() != null) {
+            // Draw the mesh using the given shader if the given shader is a shader material
+            RenderingSystem3D.batchDraw(this.vertexData, transform, shaderMaterial.shader().shaderProgram(), material);
+        } else if (material instanceof Material3D) {
+            // Draw the mesh using the given material if it is of the correct type
+            RenderingSystem3D.batchDraw(this.vertexData, transform, material);
+        } else {
+            // Draw the mesh using the default material
+            RenderingSystem3D.batchDraw(this.vertexData, transform);
+        }
+    }
+
+    public final void draw(Matrix3x4 transform) {
+        this.draw(transform, null);
     }
 }

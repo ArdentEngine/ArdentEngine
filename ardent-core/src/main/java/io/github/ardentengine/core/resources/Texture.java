@@ -25,8 +25,22 @@ public abstract class Texture {
         return new Vector2i(this.width(), this.height());
     }
 
+    public final void draw(Matrix2x3 transform, Rect2 region, Material material) {
+        if (material instanceof ShaderMaterial shaderMaterial && shaderMaterial.shader() != null) {
+            // TODO: Pass the material to the render batch
+            RenderingSystem2D.batchDraw(this.textureData, transform, region, shaderMaterial.shader().shaderProgram());
+        } else {
+            // TODO: Material2D?
+            RenderingSystem2D.batchDraw(this.textureData, transform, region);
+        }
+    }
+
+    public final void draw(Matrix2x3 transform, Material material) {
+        this.draw(transform, new Rect2(0.0f, 0.0f, 1.0f, 1.0f), material);
+    }
+
     public final void draw(Matrix2x3 transform, Rect2 region) {
-        RenderingSystem2D.batchDraw(this.textureData, transform, region);
+        this.draw(transform, region, null);
     }
 
     public final void draw(Matrix2x3 transform) {

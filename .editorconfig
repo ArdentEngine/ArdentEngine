@@ -6,6 +6,10 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
+[{*.glsl,*.vert,*.frag}]
+indent_style = space
+indent_size = 4
+
 [*.scala]
 indent_style = space
 indent_size = 2

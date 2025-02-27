@@ -12,6 +12,7 @@
         <module>ardent-demo</module>
         <module>ardent-glfw</module>
         <module>ardent-opengl</module>
+        <module>ardent-maven-plugin</module>
     </modules>
 
     <properties>
@@ -19,6 +20,18 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.github.ardentengine</groupId>
+                    <artifactId>ardent-maven-plugin</artifactId>
+                    <version>${project.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <dependencyManagement>
         <dependencies>
