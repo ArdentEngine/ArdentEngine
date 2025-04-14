@@ -15,7 +15,7 @@ public class RenderingSystem3D extends EngineSystem {
     private static final HashMap<ShaderProgram, HashMap<Material, HashMap<VertexData, Collection<Matrix3x4>>>> BATCH = new HashMap<>();
 
     private final ShaderProgram defaultShader = RenderingApi.getInstance().createShader();
-    private final UniformBuffer materialBuffer = RenderingApi.getInstance().createUniformBuffer(2, 16);
+    private final UniformBuffer materialBuffer = RenderingApi.getInstance().createUniformBuffer(2, 3 * 4 * Float.BYTES + Float.BYTES);
 
     private final Material3D defaultMaterial = new Material3D();
 
@@ -46,7 +46,7 @@ public class RenderingSystem3D extends EngineSystem {
                 if (material == null) {
                     material = this.defaultMaterial;
                 }
-                // Load the material data into the shader
+                // TODO: Change the way material data is loaded
                 this.materialBuffer.put(material.getMaterialData());
                 // TODO: Use instanced rendering instead
                 for (var vertexData : materialBatch.keySet()) {

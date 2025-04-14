@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 public class OpenglSystem extends EngineSystem {
 
-    // TODO: This class and GlfwSystem will need to change
+    // FIXME: This class only exists because GL.createCapabilities needs to be called in OpenglApi
 
     @Override
     protected void initialize() {

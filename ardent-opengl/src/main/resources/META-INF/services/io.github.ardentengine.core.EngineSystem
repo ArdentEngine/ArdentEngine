@@ -1,2 +1,3 @@
 io.github.ardentengine.opengl.OpenglSystem
+io.github.ardentengine.opengl.LightSystem
 io.github.ardentengine.opengl.CleaningSystem

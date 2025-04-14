@@ -16,9 +16,21 @@ layout(std140, binding = 1) uniform Camera3D {
     mat4 projection_matrix;
 };
 
+void vertex_shader();
+
+out vec3 world_position;
+out vec3 camera_position;
+out vec3 surface_normal;
+
 void main() {
     vertex = in_vertex;
     uv = in_uv;
     normal = in_normal;
-    gl_Position = projection_matrix * view_matrix * transform * vec4(vertex, 1.0);
+#ifdef SHADER_TYPE
+    vertex_shader();
+#endif
+    world_position = (transform * vec4(vertex, 1.0)).xyz;
+    camera_position = inverse(view_matrix)[3].xyz; // TODO: Find a better way to get the camera position
+    surface_normal = normalize(transform * vec4(normal, 0.0)).xyz;
+    gl_Position = projection_matrix * view_matrix * vec4(world_position, 1.0);
 }

@@ -7,20 +7,26 @@ children:
     properties:
       mesh: &01 !!io.github.ardentengine.core.resources.BoxMesh {}
       material: !!io.github.ardentengine.core.resources.Material3D
+        ambient: !Color {r: 0.2, g: 0.0, b: 0.0}
         diffuse: !Color {r: 1.0, g: 0.0, b: 0.0}
       position: !Vector3 {x: -2.0, y: 0.0, z: 0.0}
   - type: io.github.ardentengine.demo.TestMesh
     properties:
       mesh: *01
       material: !!io.github.ardentengine.core.resources.Material3D
+        ambient: !Color {r: 0.0, g: 0.2, b: 0.0}
         diffuse: !Color {r: 0.0, g: 1.0, b: 0.0}
       position: !Vector3 {x: 0.0, y: 0.0, z: 0.0}
   - type: io.github.ardentengine.demo.TestMesh
     properties:
       mesh: *01
       material: !!io.github.ardentengine.core.resources.Material3D
+        ambient: !Color {r: 0.0, g: 0.0, b: 0.2}
         diffuse: !Color {r: 0.0, g: 0.0, b: 1.0}
       position: !Vector3 {x: 2.0, y: 0.0, z: 0.0}
   - type: io.github.ardentengine.demo.CameraController3D
     properties:
       position: !Vector3 {x: 0.0, y: 1.0, z: 5.0}
+  - type: io.github.ardentengine.core.scene.PointLight3D
+    properties:
+      position: !Vector3 {x: 0.0, y: 2.0, z: 0.0}

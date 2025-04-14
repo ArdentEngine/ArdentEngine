@@ -12,7 +12,6 @@ import java.nio.IntBuffer;
 
 public class OpenglApi extends RenderingApi {
 
-    // TODO: If buffers are accessible in the core module then these two should be moved there
     private final OpenglUniformBuffer camera2D;
     private final OpenglUniformBuffer camera3D;
 
@@ -58,6 +57,11 @@ public class OpenglApi extends RenderingApi {
     @Override
     public UniformBuffer createUniformBuffer(int binding, long size) {
         return new OpenglUniformBuffer(binding, size);
+    }
+
+    @Override
+    public LightData createLight() {
+        return LightSystem.createLight();
     }
 
     @Override

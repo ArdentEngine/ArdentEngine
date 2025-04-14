@@ -44,9 +44,13 @@ public abstract class RenderingApi {
 
     public abstract TextureData createTexture();
 
-    // TODO: Right now users have no way to know which one is the first unused binding
+    // TODO: Uniform buffers should be removed from the core module because the user has no way to know which bindings are free
 
     public abstract UniformBuffer createUniformBuffer(int binding, long size);
+
+    public abstract LightData createLight();
+
+    // TODO: Add directional light and spot light as well
 
     public abstract void setDepthTest(boolean depthTest);
 
