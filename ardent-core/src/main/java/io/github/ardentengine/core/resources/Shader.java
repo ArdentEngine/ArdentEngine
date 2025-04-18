@@ -22,6 +22,9 @@ public class Shader {
         this.shaderProgram.compile();
     }
 
+    // TODO: Get list of shader uniforms
+    //  This is simple in OpenGL because the code is a glsl string, but more difficult in Vulkan because the code is binary SPIR-V
+
     protected final ShaderProgram shaderProgram() {
         return this.shaderProgram;
     }

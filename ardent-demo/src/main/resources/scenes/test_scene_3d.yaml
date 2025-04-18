@@ -24,9 +24,21 @@ children:
         ambient: !Color {r: 0.0, g: 0.0, b: 0.2}
         diffuse: !Color {r: 0.0, g: 0.0, b: 1.0}
       position: !Vector3 {x: 2.0, y: 0.0, z: 0.0}
+  - type: io.github.ardentengine.demo.TestMesh
+    properties:
+      mesh: *01
+      material: !!io.github.ardentengine.core.resources.ShaderMaterial
+        shader: !resource shaders/example_cube_shader.glsl
+      position: !Vector3 {x: 5.0, y: 0.0, z: 0.0}
   - type: io.github.ardentengine.demo.CameraController3D
     properties:
       position: !Vector3 {x: 0.0, y: 1.0, z: 5.0}
-  - type: io.github.ardentengine.core.scene.PointLight3D
+  - type: io.github.ardentengine.demo.ToggleLight3D
     properties:
       position: !Vector3 {x: 0.0, y: 2.0, z: 0.0}
+  - type: io.github.ardentengine.demo.ToggleLight3D
+    properties:
+      position: !Vector3 {x: 0.0, y: -1.0, z: 10.0}
+      ambient: !Color {r: 1.0, g: 1.0, b: 0.0}
+      diffuse: !Color {r: 1.0, g: 1.0, b: 0.0}
+      specular: !Color {r: 1.0, g: 1.0, b: 0.0}

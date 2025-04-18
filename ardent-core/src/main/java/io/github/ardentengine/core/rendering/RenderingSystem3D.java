@@ -46,12 +46,12 @@ public class RenderingSystem3D extends EngineSystem {
                 if (material == null) {
                     material = this.defaultMaterial;
                 }
-                // TODO: Change the way material data is loaded
+                // Load material data into the uniform buffer
                 this.materialBuffer.put(material.getMaterialData());
                 // TODO: Use instanced rendering instead
                 for (var vertexData : materialBatch.keySet()) {
                     for (var transform : materialBatch.get(vertexData)) {
-                        this.defaultShader.setUniform("transform", transform);
+                        shader.setUniform("transform", transform);
                         vertexData.draw();
                     }
                 }

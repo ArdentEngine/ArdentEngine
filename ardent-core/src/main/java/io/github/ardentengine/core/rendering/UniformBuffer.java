@@ -6,8 +6,6 @@ import java.nio.IntBuffer;
 
 public abstract class UniformBuffer {
 
-    // TODO: Uniform buffers may need to be removed from the core module
-
     public abstract void put(ByteBuffer data, long offset);
 
     public final void put(ByteBuffer data) {

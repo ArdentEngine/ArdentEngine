@@ -16,9 +16,10 @@ public class ShaderMaterial extends Material {
         this.shader = shader;
     }
 
+    // TODO: Add a method to set a shader parameter (uniform variable)
+
     @Override
     public FloatBuffer getMaterialData() {
-        // TODO: Add a way to pass uniform variables to shaders
         return RenderingApi.getInstance().createFloatBuffer(0).flip();
     }
 }

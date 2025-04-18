@@ -44,13 +44,11 @@ public abstract class RenderingApi {
 
     public abstract TextureData createTexture();
 
-    // TODO: Uniform buffers should be removed from the core module because the user has no way to know which bindings are free
+    // TODO: Allow users to create uniform buffers in a better way
+    //  The user should not need to know what bindings to use
+    //  Modify the shader processor plugin so that it adds "binding = ..." on uniform blocks at build time, keep track of those and allow the user to pass the name of the block here
 
     public abstract UniformBuffer createUniformBuffer(int binding, long size);
-
-    public abstract LightData createLight();
-
-    // TODO: Add directional light and spot light as well
 
     public abstract void setDepthTest(boolean depthTest);
 

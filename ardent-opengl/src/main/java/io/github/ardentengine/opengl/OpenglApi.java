@@ -60,11 +60,6 @@ public class OpenglApi extends RenderingApi {
     }
 
     @Override
-    public LightData createLight() {
-        return LightSystem.createLight();
-    }
-
-    @Override
     public void setDepthTest(boolean depthTest) {
         if (depthTest) {
             GL11.glEnable(GL11.GL_DEPTH_TEST);

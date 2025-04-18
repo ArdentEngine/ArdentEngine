@@ -1,43 +1,34 @@
 package io.github.ardentengine.core.scene;
 
 import io.github.ardentengine.core.math.Color;
-import io.github.ardentengine.core.rendering.LightData;
-import io.github.ardentengine.core.rendering.RenderingApi;
+import io.github.ardentengine.core.rendering.LightSystem;
 
 import java.util.Objects;
 
 public class PointLight3D extends Node3D {
 
-    private final LightData lightData = RenderingApi.getInstance().createLight();
-
     private Color ambient = Color.WHITE;
     private Color diffuse = Color.WHITE;
     private Color specular = Color.WHITE;
+    /**
+     * If {@code true}, the light will emit light.
+     */
     private boolean enabled = true;
 
     @Override
     void enterScene(SceneTree sceneTree) {
         super.enterScene(sceneTree);
-        // Set the light to be enabled or disabled when entering the scene tree
-        this.lightData.setEnabled(this.enabled);
-        // TODO: When scenes are instantiated setter methods are not called
-        this.lightData.setAmbient(this.ambient);
-        this.lightData.setDiffuse(this.diffuse);
-        this.lightData.setSpecular(this.specular);
-    }
-
-    @Override
-    void update(float deltaTime) {
-        super.update(deltaTime);
-        // TODO: Do this when the transform is changed
-        this.lightData.setPosition(this.globalPosition());
+        // Enable the light in the LightSystem when it enters the scene if it should be enabled
+        if (this.enabled) {
+            LightSystem.enableLight(this);
+        }
     }
 
     @Override
     void exitScene() {
         super.exitScene();
         // Disable the light when it exits the scene tree to hide it
-        this.lightData.setEnabled(false);
+        LightSystem.disableLight(this);
     }
 
     public final Color ambient() {
@@ -46,7 +37,6 @@ public class PointLight3D extends Node3D {
 
     public final void setAmbient(Color ambient) {
         this.ambient = Objects.requireNonNull(ambient, "Color cannot be null");
-        this.lightData.setAmbient(ambient);
     }
 
     public final Color diffuse() {
@@ -55,7 +45,6 @@ public class PointLight3D extends Node3D {
 
     public final void setDiffuse(Color diffuse) {
         this.diffuse = Objects.requireNonNull(diffuse, "Color cannot be null");
-        this.lightData.setDiffuse(diffuse);
     }
 
     public final Color specular() {
@@ -64,17 +53,34 @@ public class PointLight3D extends Node3D {
 
     public final void setSpecular(Color specular) {
         this.specular = Objects.requireNonNull(specular, "Color cannot be null");
-        this.lightData.setSpecular(specular);
     }
 
+    /**
+     * Getter method for {@link PointLight3D#enabled}.
+     * <p>
+     *     If {@code true}, the light will emit light.
+     * </p>
+     *
+     * @return {@code true} if the light is enabled, {@code false} if it is disabled.
+     */
     public final boolean enabled() {
         return this.enabled;
     }
 
+    /**
+     * Setter method for {@link PointLight3D#enabled}.
+     * <p>
+     *     If {@code true}, the light will emit light.
+     * </p>
+     *
+     * @param enabled True to enable the light, false to disable it.
+     */
     public final void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (this.isInsideScene()) {
-            this.lightData.setEnabled(enabled);
+        if (this.enabled) {
+            LightSystem.enableLight(this);
+        } else {
+            LightSystem.disableLight(this);
         }
     }
 }

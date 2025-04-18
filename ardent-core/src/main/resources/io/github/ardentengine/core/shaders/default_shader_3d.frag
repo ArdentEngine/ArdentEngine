@@ -4,16 +4,26 @@ in vec3 vertex;
 in vec2 uv;
 in vec3 normal;
 
-layout(std140, binding = 2) uniform Material {
-    vec3 ambient;
-    vec3 diffuse; // TODO: The user should be allowed to write to these values in custom shaders (SSBO?)
-    vec3 specular;
-    float shininess;
-};
-
 out vec4 frag_color;
 
+// The material data is loaded from a uniform buffer and written to these variables
+vec3 ambient;
+vec3 diffuse;
+vec3 specular;
+float shininess;
+
+// Custom shader code and uniform variables will be inserted here
 void fragment_shader();
+
+// Material data is only loaded if no custom shader is defined
+#ifndef SHADER_TYPE
+layout(std140, binding = 2) uniform Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+} material;
+#endif
 
 struct PointLight {
     vec3 position;
@@ -58,15 +68,25 @@ vec3 compute_light(PointLight light, vec3 view_direction) {
 }
 
 void main() {
-//    frag_color = vec4(vertex + 0.5, 1.0);
+    // Write the data from the uniform buffer to the material variables if no custom shader is defined
+#ifndef SHADER_TYPE
+    ambient = material.ambient;
+    diffuse = material.diffuse;
+    specular = material.specular;
+    shininess = material.shininess;
+#endif
+    // FIXME: Check if this is correct
     frag_color = vec4(diffuse, 1.0);
+    // Execute the custom shader if it is defined
 #ifdef SHADER_TYPE
     fragment_shader();
 #endif
+    // TODO: Allow to do something like "#define LIGHT_MODE unshaded" to disable lighting
     vec3 view_direction = normalize(camera_position - world_position);
     vec3 light_result = vec3(0.0);
     for (int i = 0; i < lights_count; i++) {
         light_result += compute_light(point_lights[i], view_direction);
     }
+    // TODO: Allow cell shading with something like "#define LIGHT_MODE cell_shaded"
     frag_color.rgb += light_result;
 }
