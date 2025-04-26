@@ -3,19 +3,41 @@ type: io.github.ardentengine.demo.TestScene
 properties:
   nextScene: scenes/test_scene_3d.yaml
 children:
-  - type: io.github.ardentengine.core.scene.Sprite2D
+  - type: io.github.ardentengine.core.scene.Node2D
     properties:
-      texture: !resource textures/tile_0010.png
-  - type: io.github.ardentengine.core.scene.Sprite2D
-    properties:
-      texture: !resource textures/tile_0010.png
-      position: !Vector2 {x: 5.0, y: 5.0}
-  - type: io.github.ardentengine.core.scene.Sprite2D
-    properties:
-      texture: !resource textures/tile_0010.png
-      material: !!io.github.ardentengine.core.resources.ShaderMaterial
-        shader: !resource shaders/example_sprite_shader.glsl
-      position: !Vector2 {x: 20.0, y: 2.0}
-  - type: io.github.ardentengine.demo.CameraController2D
-    properties:
-      zoom: !Vector2 {x: 5.0, y: 5.0}
+      name: "YSortParent"
+      ySort: true
+    children:
+    - type: io.github.ardentengine.core.scene.Sprite2D
+      properties:
+        name: "Zero"
+        texture: !resource textures/tile_0010.png
+    - type: io.github.ardentengine.core.scene.Sprite2D
+      properties:
+        name: "Five"
+        texture: !resource textures/tile_0010.png
+        position: !Vector2 {x: 5.0, y: 5.0}
+    - type: io.github.ardentengine.core.scene.Sprite2D
+      properties:
+        name: "Two"
+        texture: !resource textures/tile_0010.png
+        material: !!io.github.ardentengine.core.resources.ShaderMaterial
+          shader: !resource shaders/example_sprite_shader.glsl
+        position: !Vector2 {x: 20.0, y: 2.0}
+        ySort: true
+      children:
+        - type: io.github.ardentengine.core.scene.Node2D
+          properties:
+            name: "Eight"
+            position: !Vector2 {x: 0.0, y: 6.0}
+        - type: io.github.ardentengine.core.scene.Node2D
+          properties:
+            name: "Six"
+            position: !Vector2 {x: 0.0, y: 4.0}
+          children:
+            - type: io.github.ardentengine.core.scene.Node2D
+              properties:
+                name: "Antipog"
+    - type: io.github.ardentengine.demo.CameraController2D
+      properties:
+        zoom: !Vector2 {x: 5.0, y: 5.0}

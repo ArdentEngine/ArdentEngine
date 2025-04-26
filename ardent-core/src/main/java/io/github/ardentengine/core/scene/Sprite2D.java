@@ -13,7 +13,7 @@ public class Sprite2D extends Node2D {
     // TODO: Sprite atlas, flipping, and region
 
     @Override
-    void update(float deltaTime) {
+    void draw() {
         // TODO: Don't draw the texture if the sprite is not within the camera's view rect
         if (this.texture != null) {
             if (this.material != null) {
@@ -22,7 +22,7 @@ public class Sprite2D extends Node2D {
                 this.texture.draw(this.globalTransform());
             }
         }
-        super.update(deltaTime);
+        super.draw();
     }
 
     public final Texture texture() {

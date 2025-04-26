@@ -3,7 +3,11 @@ package io.github.ardentengine.core.scene;
 import io.github.ardentengine.core.math.Matrix2x3;
 import io.github.ardentengine.core.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 /**
  * Base class for all 2D objects.
@@ -14,6 +18,9 @@ import java.util.Objects;
  */
 public class Node2D extends Node {
 
+    private static final Comparator<Node2D> Y_SORT_COMPARATOR = (n1, n2) -> Float.compare(n2.globalPosition().y(), n1.globalPosition().y());
+    private static final Function<Integer, ArrayList<Node2D>> LIST_FUNCTION = z -> new ArrayList<>();
+
     /** Position of this node relative to its parent. */
     private Vector2 position = Vector2.ZERO;
     /**Rotation in radians of this node relative to its parent. */
@@ -23,19 +30,26 @@ public class Node2D extends Node {
 
     // TODO: Skew
 
-    // TODO: Z-index and Y-sort
+    /**
+     * Controls the order in which the node is drawn.
+     * <p>
+     *     Nodes with a lower z index will be drawn first.
+     *     Nodes with a higher z index will be drawn in front of others.
+     * </p>
+     */
+    private int zIndex = 0;
+    /**
+     * If {@code true}, child nodes with a higher y position will be drawn behind nodes with a lower y position.
+     * <p>
+     *     Nodes sort relative to each other only if they are on the same {@link Node2D#zIndex}.
+     * </p>
+     */
+    private boolean ySort = false;
 
     /** Cached local transform. */
     private Matrix2x3 localTransform = null;
     /** Cached global transform. */
     private Matrix2x3 globalTransform = null;
-
-    @Override
-    void exitScene() {
-        this.localTransform = null;
-        this.globalTransform = null;
-        super.exitScene();
-    }
 
     /**
      * Package-protected method used to invalidate this node's transform when its position, rotation, or scale are changed.
@@ -279,7 +293,153 @@ public class Node2D extends Node {
         }
     }
 
-    // TODO: Z-index and Y-sort
+    /**
+     * Getter method for {@link Node2D#zIndex}.
+     * <p>
+     *     Controls the order in which the node is drawn.
+     * </p>
+     *
+     * @return Index of the z layer of this node.
+     */
+    public final int zIndex() {
+        return this.zIndex;
+    }
+
+    /**
+     * Setter method for {@link Node2D#zIndex}.
+     * <p>
+     *     Controls the order in which the node is drawn.
+     * </p>
+     *
+     * @param zIndex Index of the z layer of this node.
+     */
+    public final void setZIndex(int zIndex) {
+        this.zIndex = zIndex;
+    }
+
+    /**
+     * Getter method for {@link Node2D#ySort}.
+     *
+     * @return {@code true} if y-sorting is enabled, otherwise {@code false}.
+     */
+    public final boolean ySort() {
+        return this.ySort;
+    }
+
+    /**
+     * Setter method for {@link Node2D#ySort}.
+     *
+     * @param ySort {@code true} to enable y-sorting, {@code false} to disable it.
+     */
+    public final void setYSort(boolean ySort) {
+        this.ySort = ySort;
+    }
+
+    /**
+     * Called when this node is being drawn.
+     * <p>
+     *     This method can be extended to draw something specific for which there isn't a dedicated node.
+     * </p>
+     */
+    protected void onDraw() {
+
+    }
+
+    /**
+     * Called when this node is being drawn.
+     */
+    void draw() {
+        this.onDraw();
+    }
+
+    // TODO: Check if PriorityQueue is better than TreeMap or ArrayList
+
+    /**
+     * Recursive method that adds all descendants of this node with {@link Node2D#ySort} enabled to the given map.
+     * This method effectively flattens the tree so that nodes can then be sorted properly according to their y position.
+     *
+     * @param ySortChildren Resulting map.
+     * @param zIndex Effective z index of this node.
+     */
+    private void ySortCollect(TreeMap<Integer, ArrayList<Node2D>> ySortChildren, int zIndex) {
+        // Iterate through the children of this node
+        for (var child : this.children()) {
+            // Look for children of type Node2D
+            if (child instanceof Node2D child2d) {
+                // Add all children of type Node2D to the resulting map
+                ySortChildren.computeIfAbsent(zIndex + child2d.zIndex(), LIST_FUNCTION).add(child2d);
+                // Call this method recursively if this child also has ySort enabled
+                if (child2d.ySort()) {
+                    child2d.ySortCollect(ySortChildren, zIndex + child2d.zIndex());
+                }
+            }
+        }
+    }
+
+    // TODO: Allow nodes to be set as invisible
+
+    /**
+     * Recursive method that adds all descendants of this node to the given map.
+     * The resulting map can then be used to draw the nodes in the correct order.
+     *
+     * @param drawQueue Queue to which nodes to be drawn are added.
+     * @param zIndex Effective z index of the parent node.
+     */
+    private void queueDraw(TreeMap<Integer, ArrayList<Node2D>> drawQueue, int zIndex, boolean ySort) {
+        // Add this node to the draw queue
+        drawQueue.computeIfAbsent(zIndex + this.zIndex(), LIST_FUNCTION).add(this);
+        // The tree must be flattened if ySort is enabled
+        if (this.ySort()) {
+            // This branch has already been queued if the parent of this node has ySort enabled
+            if (!ySort) {
+                // Create a new tree map to hold nodes that should be sorted
+                var ySortChildren = new TreeMap<Integer, ArrayList<Node2D>>();
+                // Recursively look for descendants that should be y sorted
+                this.ySortCollect(ySortChildren, zIndex + this.zIndex());
+                // Draw the collected nodes in order according to their y position
+                for (var z : ySortChildren.keySet()) {
+                    var ySortList = ySortChildren.get(z);
+                    ySortList.sort(Y_SORT_COMPARATOR);
+                    // Add the node and possibly its descendant to the draw queue
+                    for (var ySortNode : ySortList) {
+                        ySortNode.queueDraw(drawQueue, z, true);
+                    }
+                }
+            }
+        } else {
+            // Recursively add the children of this node to the draw queue
+            for (var child : this.children()) {
+                if (child instanceof Node2D) {
+                    ((Node2D) child).queueDraw(drawQueue, zIndex + this.zIndex(), this.ySort());
+                }
+            }
+        }
+    }
+
+    @Override
+    void update(float deltaTime) {
+        // Draw this node and its descendants if it is the root of a 2D branch
+        if (!(this.parent() instanceof Node2D)) {
+            // Use a draw queue to respect zIndex and ySort
+            var drawQueue = new TreeMap<Integer, ArrayList<Node2D>>();
+            this.queueDraw(drawQueue, 0, false);
+            // Drawing happens in preorder
+            for (var drawList : drawQueue.values()) {
+                for (var drawNode : drawList) {
+                    drawNode.draw();
+                }
+            }
+        }
+        // Update happens in postorder
+        super.update(deltaTime);
+    }
+
+    @Override
+    void exitScene() {
+        this.localTransform = null;
+        this.globalTransform = null;
+        super.exitScene();
+    }
 
     /**
      * Returns this node's local transform as a 2x3 transformation matrix.

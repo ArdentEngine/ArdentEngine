@@ -52,8 +52,8 @@ The engine will be responsible for loading the correct library for the current o
 | Resource manager                   | Done        |
 | Keyboard input system              | Done        |
 | Input map                          | In progress |
-| Basic 3D lighting                  | Missing     |
-| Basic materials and shaders system | Missing     |
+| Basic 3D lighting                  | In progress |
+| Basic materials and shaders system | In progress |
 
 ### Version 0.2
 
